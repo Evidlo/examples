@@ -1,18 +1,31 @@
 #!/bin/octave
 %plot frequency response of transfer function
 
+## Vi  o----- sL ------o Vo
+##       |         |
+##       |        1/sC
+##       |         |
+## Gnd o----- R -------o
 
-function out = bode(w)
-  s = i*w;
-  out = 1./(s+1);
-endfunction
+##              (R/L)s + 1/(LC)
+## Vo/Vi =   ---------------------
+##           s^2 + (R/L)s + 1/(LC)
 
-f = linspace(0,10,1000)
-w = 2*pi*f
 
-hold on
-plot(f,bode(w))
+pkg load control
+
+R=1;
+L=1;
+C=1;
+
+system = tf([R/L 1/(L*C)],[1 R/L 1/(L*C)])
+
+subplot(2,1,1)
+bode(system)
 xlabel('Frequency Hz')
 ylabel('Gain')
 
-pause
+subplot(2,1,1)
+t = linspace(0,100,10000);
+y = sin(t);
+lsim(sys,y,t)
