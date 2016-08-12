@@ -10,7 +10,8 @@ N = duration*sample_freq;
 n = 0:N-1;
 
 x_time = sin(2*pi*1*n/N) + cos(2*pi*5*n/N);
-x = [0 -12.5i 0 0 0 12.5 0 0 0 0 0 0 0 0 0 0 0 0 0 0 12.5 0 0 0 12.5i];
+## x = [0 -12.5i 0 0 0 12.5 0 0 0 0 0 0 0 0 0 0 0 0 0 0 12.5 0 0 0 12.5i];
+x = fft(x_time);
 
 ## show original signal
 subplot(6,1,1)

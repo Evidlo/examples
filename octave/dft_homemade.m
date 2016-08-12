@@ -3,7 +3,7 @@
 ## DFT Testing - practicing and understanding DFT
 
 duration = 1;
-sample_freq = 25;
+sample_freq = 50;
 
 N = duration*sample_freq;
 
@@ -31,28 +31,31 @@ for k = n
   ## calculate correlation by summing previous signal
   subplot(6,1,3)
   hold on
-  plot(k,sum(c.*x))
+  plot(k,sum(c.*x),'o')
   grid on
   hold off
+  ylim([0 25])
   title('Cosine Components')
 
   ## calculate correlation by summing previous signal
   subplot(6,1,4)
   hold on
-  plot(k,sum(s.*x))
+  plot(k,sum(s.*x),'o')
   grid on
   hold off
+  ylim([0 25])
   title('Sine Components')
 
   drawnow
+  pause
 endfor
 
 ## show FFT for comparison
 subplot(6,1,5)
-plot(n,real(fft(x)))
+plot(n,real(fft(x)),'o')
 grid on
 title('FFT Result - Real Components')
 subplot(6,1,6)
-plot(n,imag(fft(x)))
+plot(n,imag(fft(x)),'o')
 grid on
 title('FFT Result - Imaginary Components')
