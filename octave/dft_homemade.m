@@ -34,17 +34,18 @@ for k = n
   plot(k,sum(c.*x),'o')
   grid on
   hold off
-  ylim([0 25])
-  title('Cosine Components')
+  axis([0 N-1 -25 25])
+  title('Imaginary Components')
 
   ## calculate correlation by summing previous signal
   subplot(6,1,4)
   hold on
   plot(k,sum(s.*x),'o')
+  sum(s.*x)
   grid on
   hold off
-  ylim([0 25])
-  title('Sine Components')
+  axis([0 N-1 -25 25])
+  title('Real Components')
 
   drawnow
   pause
