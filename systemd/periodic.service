@@ -1,0 +1,5 @@
+[Unit]
+Description=Run a script when periodic.timer triggers
+
+[Service]
+ExecStart=/path/to/myscript

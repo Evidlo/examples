@@ -1,0 +1,13 @@
+[Unit]
+Description=Run periodic.service on timer
+
+[Timer]
+# run periodic.service at the 0,15,30,45m mark of every hour
+OnCalendar=*:0/15
+# run the service immediately upon timer reenable
+# if the service should have been run while the timer was disabled
+Persistent=true
+
+[Install]
+# activate this timer with all other timers
+WantedBy=timers.target
