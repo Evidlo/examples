@@ -32,6 +32,14 @@ class symbol(object):
         return add(self, mul(-1, other))
     __rsub__ = __sub__
 
+    def diff(self, with_respect_to='x'):
+        if type(self.val) is int:
+            return 0
+        elif self.val == with_respect_to:
+            return symbol(1)
+        else:
+            return diff(self, with_respect_to)
+
     def eval(self, **kwargs):
         # return int, evaluated symbol, unevaluated symbol
         if type(self.val) is int:
@@ -40,6 +48,7 @@ class symbol(object):
             return kwargs[self.val]
         else:
             return self
+
 
 class operation(symbol):
 
@@ -53,6 +62,19 @@ class operation(symbol):
         else:
             self.b = b
 
+
+class diff(operation):
+
+    def __repr__(self):
+        return "(d{}/d{})".format(self.a, self.b)
+
+    def eval(self, **kwargs):
+        if 'd{}d{}'.format(self.a, self.b) in kwargs:
+            return kwargs['d{}d{}'.format(self.a, self.b)]
+        else:
+            return self.a.diff(self.b)
+
+
 class add(operation):
 
     def __repr__(self):
@@ -61,6 +83,10 @@ class add(operation):
     def eval(self, **kwargs):
         return self.a.eval(**kwargs) + self.b.eval(**kwargs)
 
+    def diff(self, with_respect_to='x'):
+        return self.a.diff(with_respect_to=with_respect_to) + self.b.diff(with_respect_to=with_respect_to)
+
+
 class mul(operation):
 
     def __repr__(self):
@@ -68,3 +94,6 @@ class mul(operation):
 
     def eval(self, **kwargs):
         return self.a.eval(**kwargs) * self.b.eval(**kwargs)
+
+    def diff(self, with_respect_to='x'):
+        return self.a*self.b.diff(with_respect_to=with_respect_to) + self.b*self.a.diff(with_respect_to=with_respect_to)
