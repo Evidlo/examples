@@ -4,13 +4,18 @@
 
 /inch {72 mul} def
 
+% center of page
 /center_x 4.25 def
 /center_y 5.5 def
 
+% fractal depth
 /depth 4 def
+
+% length, width of each segment
 /length center_y 4 depth exp div def
 /width length 5 div def
 
+% recursive function for drawing generic squiggle
 /forward {
     depth 0 gt
     /depth depth 1 sub def
@@ -44,7 +49,7 @@
 
 } def
 
-
+% draw four branches at 90 degree angles
 gsave
 0 90 270 {
     newpath
