@@ -7,7 +7,7 @@
 /center_x 4.25 def
 /center_y 5.5 def
 
-/depth 5 def
+/depth 4 def
 /length center_y 4 depth exp div def
 /width length 5 div def
 
@@ -44,38 +44,17 @@
 
 } def
 
-gsave
-newpath
-center_x inch center_y inch moveto
-forward
-width setlinewidth
-stroke
 
-grestore
 gsave
-newpath
-center_x inch center_y inch moveto
-90 rotate
-forward
-width setlinewidth
-stroke
-
-grestore
-gsave
-newpath
-center_x inch center_y inch moveto
-180 rotate
-forward
-width setlinewidth
-stroke
-
-grestore
-gsave
-newpath
-center_x inch center_y inch moveto
-270 rotate
-forward
-width setlinewidth
-stroke
+0 90 270 {
+    newpath
+    grestore
+    gsave
+    center_x inch center_y inch moveto
+    rotate
+    forward
+    width setlinewidth
+    stroke
+} for
 
 showpage
