@@ -4,9 +4,16 @@
 
 /inch {72 mul} def
 
+/center_x 4.25 def
+/center_y 5.5 def
+
+/depth 5 def
+/length center_y 4 depth exp div def
+/width length 5 div def
+
 /forward {
-    /depth depth 1 sub def
     depth 0 gt
+    /depth depth 1 sub def
     {
         forward
         % turn left
@@ -30,16 +37,45 @@
         forward
     }
     {
-        0 .045 inch rlineto
+        0 length inch rlineto
     }
     ifelse
     /depth depth 1 add def
 
 } def
 
+gsave
 newpath
-4.25 inch 0 inch moveto
-/depth 5 def
+center_x inch center_y inch moveto
 forward
-2 setlinewidth
+width setlinewidth
 stroke
+
+grestore
+gsave
+newpath
+center_x inch center_y inch moveto
+90 rotate
+forward
+width setlinewidth
+stroke
+
+grestore
+gsave
+newpath
+center_x inch center_y inch moveto
+180 rotate
+forward
+width setlinewidth
+stroke
+
+grestore
+gsave
+newpath
+center_x inch center_y inch moveto
+270 rotate
+forward
+width setlinewidth
+stroke
+
+showpage
