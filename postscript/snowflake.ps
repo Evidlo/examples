@@ -1,0 +1,45 @@
+%!
+% Evan Widloski - 2017-09-28
+% Quadratic Koch Snowflake
+
+/inch {72 mul} def
+
+/forward {
+    /depth depth 1 sub def
+    depth 0 gt
+    {
+        forward
+        % turn left
+        90 rotate
+        forward
+        % turn right
+        -90 rotate
+        forward
+        % turn right
+        -90 rotate
+        forward
+        forward
+        % turn left
+        90 rotate
+        forward
+        % turn left
+        90 rotate
+        forward
+        % turn right
+        -90 rotate
+        forward
+    }
+    {
+        0 .045 inch rlineto
+    }
+    ifelse
+    /depth depth 1 add def
+
+} def
+
+newpath
+4.25 inch 0 inch moveto
+/depth 5 def
+forward
+2 setlinewidth
+stroke
