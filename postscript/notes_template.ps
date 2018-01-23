@@ -1,0 +1,85 @@
+%!
+% Evan Widloski - 2018-01-22
+% Class Notes Template
+
+% set landscape
+90 rotate
+
+/inch {72 mul} def
+
+% define page dimensions
+/page_height 8.5 def
+/page_width 11 def
+
+% width of all graphic lines on page
+/solid_width 1 def
+/dotted_width .5 def
+
+% dashed line style
+/dash_style {1 setlinecap .25 setlinewidth [0 inch .125 inch] 0} def
+% dashed line grayscale
+/dash_gray .25 def
+
+% horizontal title line
+/title_height .375 def
+0 title_height neg inch moveto
+page_width inch 0 rlineto
+solid_width setlinewidth
+stroke
+
+% vertical separator
+page_width 2 div inch title_height neg inch moveto
+0 page_height neg inch rlineto
+solid_width setlinewidth
+stroke
+
+/Helvetica findfont
+12 scalefont
+setfont
+.25 inch -12 .125 inch sub moveto
+(Class:) show
+page_width 1 sub inch -12 .125 inch sub moveto
+(Page:) show
+
+%------- vertical alignment lines -------
+% vertical line spacing
+/vertical_spacing .25 def
+/vdotted {
+    dotted_width setlinewidth
+    vertical_spacing inch 0 rmoveto
+    gsave
+    0 page_height neg inch rlineto
+    dash_style setdash
+    dash_gray setgray
+    stroke
+    grestore
+    vertical_spacing inch 0 rmoveto
+    0 page_height neg inch rlineto
+    dash_style setdash
+    dash_gray setgray
+    stroke
+} def
+
+0 title_height neg inch moveto
+vdotted
+page_width 2 div inch title_height neg inch moveto
+vdotted
+
+%------- horizontal alignment lines -------
+% horizontal line spacing
+/horizontal_spacing .25 def
+/hdotted {
+    page_height horizontal_spacing div cvi {
+        gsave
+        page_width 2 div vertical_spacing 2 mul sub inch 0 rlineto
+        dash_style setdash
+        dash_gray setgray
+        stroke
+        grestore
+        0 horizontal_spacing neg inch rmoveto
+    } repeat
+} def
+vertical_spacing 2 mul inch title_height neg inch moveto
+hdotted
+page_width 2 div vertical_spacing 2 mul add inch title_height neg inch moveto
+hdotted
