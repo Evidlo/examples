@@ -16,7 +16,7 @@
 /dotted_width .5 def
 
 % dashed line style
-/dash_style {1 setlinecap .25 setlinewidth [0 inch .125 inch] 0} def
+/dash_style {1 setlinecap dotted_width setlinewidth [0 inch .125 inch] 0} def
 % dashed line grayscale
 /dash_gray .25 def
 
@@ -45,7 +45,6 @@ page_width 1 sub inch -12 .125 inch sub moveto
 % vertical line spacing
 /vertical_spacing .25 def
 /vdotted {
-    dotted_width setlinewidth
     vertical_spacing inch 0 rmoveto
     gsave
     0 page_height neg inch rlineto
