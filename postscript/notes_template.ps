@@ -14,32 +14,77 @@
 % width of all graphic lines on page
 /solid_width 1 def
 /dotted_width .5 def
+/box_width .5 def
 
+/grid_spacing 1 8 div def
 % dashed line style
-/dash_style {1 setlinecap dotted_width setlinewidth [0 inch .125 inch] 0} def
+/dash_style {1 setlinecap dotted_width setlinewidth [0 inch grid_spacing inch] 0} def
+% dashed box style
+/box_style {1 setlinecap dotted_width setlinewidth [1 32 div inch 1 16 div inch] 0} def
 % dashed line grayscale
 /dash_gray .25 def
 
 % horizontal title line
-/title_height .375 def
+/title_height .5 def
 0 title_height neg inch moveto
 page_width inch 0 rlineto
 solid_width setlinewidth
 stroke
 
 % vertical separator
-page_width 2 div inch title_height neg inch moveto
+page_width 2 div inch 0 moveto
 0 page_height neg inch rlineto
 solid_width setlinewidth
 stroke
 
+% draw box
+/box {
+    /delta_y exch def
+    /delta_x exch def
+    gsave
+    delta_x 0 rlineto
+    0 delta_y rlineto
+    delta_x neg 0 rlineto
+    0 delta_y neg rlineto
+    box_width setlinewidth
+    % box_style setdash
+    stroke
+    grestore
+    delta_x 0 rmoveto
+} def
+
+% vertical text
+/vertical{
+    gsave
+    90 rotate
+    dup stringwidth exch pop
+    0 exch neg rmoveto
+    show
+    grestore
+} def
+
+
+%-------- title bar --------
 /Helvetica findfont
-12 scalefont
+8 scalefont
 setfont
-.25 inch -12 .125 inch sub moveto
-(Class:) show
-page_width 1 sub inch -12 .125 inch sub moveto
-(Page:) show
+/draw_header {
+    (topic) vertical
+    1 16 div inch 0 rmoveto
+    1 inch .25 inch box
+    1 8 div inch 0 rmoveto
+    (tags) vertical
+    1 16 div inch 0 rmoveto
+    3 inch .25 inch box
+    1 8 div inch 0 rmoveto
+    (page) vertical
+    1 16 div inch 0 rmoveto
+    .5 inch .25 inch box
+} def
+1 4 div inch -12 .25 inch sub moveto
+draw_header
+page_width 2 div 1 4 div add inch -12 .25 inch sub moveto
+draw_header
 
 %------- vertical alignment lines -------
 % vertical line spacing
@@ -66,16 +111,15 @@ vdotted
 
 %------- horizontal alignment lines -------
 % horizontal line spacing
-/horizontal_spacing .25 def
 /hdotted {
-    page_height horizontal_spacing div cvi {
+    page_height grid_spacing div cvi {
         gsave
         page_width 2 div vertical_spacing 2 mul sub inch 0 rlineto
         dash_style setdash
         dash_gray setgray
         stroke
         grestore
-        0 horizontal_spacing neg inch rmoveto
+        0 grid_spacing neg inch rmoveto
     } repeat
 } def
 vertical_spacing 2 mul inch title_height neg inch moveto

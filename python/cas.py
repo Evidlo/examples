@@ -74,6 +74,9 @@ class diff(operation):
         else:
             return self.a.diff(self.b)
 
+    def diff(self, with_respect_to='x'):
+        return diff(self, with_respect_to)
+
 
 class add(operation):
 
