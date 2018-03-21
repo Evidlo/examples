@@ -6,11 +6,10 @@ import matplotlib.pyplot as plt
 from matplotlib.widgets import Slider, Button, RadioButtons
 
 # define slider positions (axes)
-axis_color = 'lightgoldenrodyellow'
-slide_x2_axis = plt.axes([0.25, 0.05, 0.65, 0.03], axisbg=axis_color)
-slide_x12_axis = plt.axes([0.25, 0.1, 0.65, 0.03], axisbg=axis_color)
-slide_x1_axis = plt.axes([0.25, 0.15, 0.65, 0.03], axisbg=axis_color)
-slide_samples_axis = plt.axes([0.25, 0.2, 0.65, 0.03], axisbg=axis_color)
+slide_x2_axis = plt.axes([0.25, 0.05, 0.65, 0.03])
+slide_x12_axis = plt.axes([0.25, 0.1, 0.65, 0.03])
+slide_x1_axis = plt.axes([0.25, 0.15, 0.65, 0.03])
+slide_samples_axis = plt.axes([0.25, 0.2, 0.65, 0.03])
 
 # define sliders
 slide_x1 = Slider(slide_x1_axis, '$\sigma_1^2$', 0, 10, valinit=1)
