@@ -1,14 +1,19 @@
 #!/bin/env python3
 # Evan Widloski - 2018-04-11
-# pygcrypt/pykeepass experimentation
+# keepass decrypt experimentation
+# only works on AES encrypted database with unprotected entries
 
 # Useful reference: https://gist.github.com/msmuenchen/9318327
 #                   https://framagit.org/okhin/pygcrypt/#use
+#                   https://github.com/libkeepass/libkeepass/tree/master/libkeepass
 
 import struct
 
 database = 'test.kdbx'
 password = b'shatpass'
+# password = None
+keyfile = 'test.key'
+# keyfile = None
 
 b = []
 with open('test.kdbx', 'rb') as f:
@@ -65,16 +70,45 @@ offset += 1 + 2 + size
 from pygcrypt.ciphers import Cipher
 from pygcrypt.context import Context
 import hashlib
+import zlib
+from lxml import etree
+import base64
 
 encrypted_payload = b[offset:]
 
-# hash the password into a composite key
-sha256 = hashlib.sha256()
-sha256.update(password)
-composite_password = sha256.digest()
-sha256 = hashlib.sha256()
-sha256.update(composite_password)
-composite_key = sha256.digest()
+# hash the password
+if password:
+    password_composite = hashlib.sha256(password).digest()
+else:
+    password_composite = b''
+# hash the keyfile
+if keyfile:
+    # try to read XML keyfile
+    try:
+        with open(keyfile, 'r') as f:
+            tree = etree.parse(f).getroot()
+            keyfile_composite = base64.b64decode(tree.find('Key/Data').text)
+    # otherwise, try to read plain keyfile
+    except Exception as e:
+        try:
+            with open(keyfile, 'rb') as f:
+                key = f.read()
+                # if the length is 32 bytes we assume it is the key
+                if len(key) == 32:
+                    keyfile_composite = key
+                # if the length is 64 bytes we assume the key is hex encoded
+                if len(key) == 64:
+                    keyfile_composite =  key.decode('hex')
+                # anything else may be a file to hash for the key
+                keyfile_composite = hashlib.sha256(key).digest()
+        except:
+            raise IOError('Could not read keyfile')
+
+else:
+    keyfile_composite = b''
+
+# create composite key from password and keyfile composites
+key_composite = hashlib.sha256(password_composite + keyfile_composite).digest()
 
 # set up a context for AES128-ECB encryption to find transformed_key
 context = Context()
@@ -83,19 +117,15 @@ context.cipher = cipher
 context.key = bytes(header['transform_seed'])
 context.iv = b'\x00' * 16
 
-# get the number of rounds from the header and transform the composite_key
+# get the number of rounds from the header and transform the key_composite
 rounds = struct.unpack('<Q', header['transform_rounds'])[0]
-transformed_key = composite_key
+transformed_key = key_composite
 for _ in range(0, rounds):
     transformed_key = context.cipher.encrypt(transformed_key)
 
 # combine the transformed key with the header master seed to find the master_key
-sha256 = hashlib.sha256()
-sha256.update(transformed_key)
-transformed_key = sha256.digest()
-sha256 = hashlib.sha256()
-sha256.update(bytes(header['master_seed']) + transformed_key)
-master_key = sha256.digest()
+transformed_key = hashlib.sha256(transformed_key).digest()
+master_key = hashlib.sha256(bytes(header['master_seed']) + transformed_key).digest()
 
 # set up a context for AES128-CBC decryption to find the decrypted payload
 context = Context()
@@ -104,3 +134,41 @@ context.cipher = cipher
 context.key = master_key
 context.iv = bytes(header['encryption_iv'])
 raw_payload_area = context.cipher.decrypt(bytes(encrypted_payload))
+
+# verify decryption
+if header['stream_start_bytes'] != raw_payload_area[:len(header['stream_start_bytes'])]:
+    raise IOError('Decryption failed')
+
+# remove stream start bytes
+offset = len(header['stream_start_bytes'])
+payload_data = b''
+
+# read payload block data, block by block
+while True:
+    # read index of block (4 bytes)
+    block_index = struct.unpack('<I', raw_payload_area[offset:offset + 4])[0]
+    # read block_data sha256 hash (32 bytes)
+    block_hash = raw_payload_area[offset + 4:offset + 36]
+    # read block_data length (4 bytes)
+    block_length = struct.unpack('<I', raw_payload_area[offset + 36:offset + 40])[0]
+    # read block_data
+    block_data = raw_payload_area[offset + 40:offset + 40 + block_length]
+
+    # check if last block
+    if block_hash == b'\x00' * 32 and block_length == 0:
+        break
+
+    # verify block validity
+    if block_hash != hashlib.sha256(block_data).digest():
+        raise IOError('Block hash verification failed')
+
+    # append verified block_data and move to next block
+    payload_data += block_data
+    offset += 40 + block_length
+
+# check if payload_data is compressed
+if struct.unpack('<I', header['compression_flags']):
+    # decompress using gzip
+    xml_data = zlib.decompress(payload_data, 16 + 15)
+else:
+    xml_data = payload_data
