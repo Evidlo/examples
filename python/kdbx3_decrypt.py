@@ -9,14 +9,14 @@
 
 import struct
 
-database = 'test.kdbx'
+database = 'test3.kdbx'
 password = b'shatpass'
 # password = None
-keyfile = 'test.key'
+keyfile = 'test3.key'
 # keyfile = None
 
 b = []
-with open('test.kdbx', 'rb') as f:
+with open(database, 'rb') as f:
     b = bytearray(f.read())
 
 # ---------- Header Stuff ----------
