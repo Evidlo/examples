@@ -144,13 +144,14 @@ else:
 key_composite = hashlib.sha256(password_composite + keyfile_composite).digest()
 
 if kdf_parameters['$UUID'] == kdf_uuids['argon2']:
-    transformed_key = argon2.low_level.hash_secret(key_composite,
-                                                       kdf_parameters['S'],
-                                                       hash_len=256,
+    transformed_key = argon2.low_level.hash_secret_raw(secret=key_composite,
+                                                       salt=kdf_parameters['S'],
+                                                       hash_len=32,
                                                        type=argon2.low_level.Type.D,
                                                        time_cost=kdf_parameters['I'],
                                                        memory_cost=kdf_parameters['M'] // 1000,
                                                        parallelism=kdf_parameters['P'],
+                                                       version=kdf_parameters['V']
     )
 elif kdf_parameters['$UUID'] == kdf_uuids['aes']:
     # set up a context for AES128-ECB encryption to find transformed_key
