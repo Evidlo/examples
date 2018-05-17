@@ -39,7 +39,6 @@ header_item_ids = {0: 'end',
                    11: 'kdf_parameters'
 }
 
-
 # read dynamic header
 
 # offset of first header byte
@@ -143,13 +142,14 @@ else:
 # create composite key from password and keyfile composites
 key_composite = hashlib.sha256(password_composite + keyfile_composite).digest()
 
+
 if kdf_parameters['$UUID'] == kdf_uuids['argon2']:
     transformed_key = argon2.low_level.hash_secret_raw(secret=key_composite,
                                                        salt=kdf_parameters['S'],
                                                        hash_len=32,
                                                        type=argon2.low_level.Type.D,
                                                        time_cost=kdf_parameters['I'],
-                                                       memory_cost=kdf_parameters['M'] // 1000,
+                                                       memory_cost=kdf_parameters['M'] // 1024,
                                                        parallelism=kdf_parameters['P'],
                                                        version=kdf_parameters['V']
     )
@@ -172,7 +172,7 @@ else:
     raise Exception('Unsupported key derivation method')
 
 # combine the transformed key with the header master seed to find the master_key
-master_key = hashlib.sha256(bytes(header['master_seed']) + transformed_key).digest()
+master_key = hashlib.sha256(header['master_seed'] + transformed_key).digest()
 
 # validate second header hash
 hmac_key = hashlib.sha512(b'\xff' * 8 + hashlib.sha512(header['master_seed'] + transformed_key + b'\x01').digest()).digest()
@@ -198,6 +198,8 @@ while True:
 
 payload_ciphers = {
     'aes256': b'1\xc1\xf2\xe6\xbfqCP\xbeX\x05!j\xfcZ\xff',
+    # 'twofish': b'\xadh\xf2\x9fWoK\xb9\xa3j\xd4z\xf9e4l',
+    # 'chacha20': b'\xd6\x03\x8a+\x8boL\xb5\xa5$3\x9a1\xdb\xb5\x9a'
 }
 
 # ---------- Decrypt payload ----------
