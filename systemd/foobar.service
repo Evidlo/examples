@@ -1,0 +1,14 @@
+[Unit]
+Description=A service that does foo
+
+[Service]
+WorkingDirectory=/full/path/to/dir/
+# program to execute
+ExecStart=/full/path/to/program
+# restart if program crashes
+Restart=always
+# user to run program as (uncomment this line for user units)
+User=foo
+
+[Install]
+WantedBy=multi-user.target
