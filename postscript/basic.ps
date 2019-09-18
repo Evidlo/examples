@@ -1,0 +1,99 @@
+%!
+% Postscript demo
+% Evan Widloski - 2018-10-23
+
+% ----- drawing text -----
+
+/inch {72 mul} def        % define a function 'inch'
+/center_x 4.25 inch def   % define a variable
+/center_y 5.5 inch def
+
+center_x center_y moveto  % move to given coordinates
+
+/Times-Roman findfont
+30 scalefont
+setfont              % set the font to times new roman
+
+(Hello world!) show
+
+% ----- drawing boxes -----
+
+% method 1
+30 0 rlineto         % draw line right 30 pts relative to current pos.
+0 30 rlineto
+-30 0 rlineto
+0 -30 rlineto
+stroke               % stroke out the path
+
+6 inch 6 inch moveto % postscript forgets the current pos. after stroke, reset it
+
+% method 2
+30 0 rlineto
+90 rotate            % rotate the whole screen 90 degrees
+30 0 rlineto
+90 rotate
+30 0 rlineto
+90 rotate
+30 0 rlineto
+90 rotate
+10 setlinewidth      % set width before stroke, needs to be reset later
+closepath
+stroke
+
+1 setlinewidth
+
+% ----- repeating -----
+
+7 inch 6 inch moveto
+
+10 {
+    gsave            % save our current position
+    0 50 rlineto
+    stroke           % draw a vertical line
+    grestore
+    5 0 rmoveto
+} repeat             % repeat expression 10 times
+
+
+1 inch 3 inch moveto
+/foo {10 {
+    0 -120 rlineto
+    36 rotate
+    0 60 rlineto
+    36 rotate
+    0 -189 rlineto
+    36 rotate
+
+    -90 rotate
+    0 20 rlineto
+    180 rotate
+    0 20 rlineto
+    -90 rotate
+      } repeat} def
+
+/scale 1 def
+100 {
+    40 {
+    0 -120 scale div rlineto
+    36 rotate
+    0 60 scale div rlineto
+    36 rotate
+    0 -189 scale div rlineto
+    36 rotate
+
+    -90 rotate
+    0 20 scale div rlineto
+    180 rotate
+    0 20 scale div rlineto
+    -90 rotate
+    } repeat
+    55 scale div 0 scale div rmoveto
+    /scale scale 2.02 mul def
+} repeat
+closepath
+% fill
+stroke
+
+
+showpage
+
