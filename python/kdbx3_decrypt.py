@@ -67,8 +67,7 @@ offset += 1 + 2 + size
 
 # ---------- Payload Stuff ----------
 
-from pygcrypt.ciphers import Cipher
-from pygcrypt.context import Context
+from Crypto.Cipher import AES
 import hashlib
 import zlib
 from lxml import etree
@@ -111,49 +110,42 @@ else:
 key_composite = hashlib.sha256(password_composite + keyfile_composite).digest()
 
 # set up a context for AES128-ECB encryption to find transformed_key
-context = Context()
-cipher = Cipher(b'AES', u'ECB')
-context.cipher = cipher
-context.key = bytes(header['transform_seed'])
-context.iv = b'\x00' * 16
+cipher = AES.new(bytes(header['transform_seed']), AES.MODE_ECB)
 
 # get the number of rounds from the header and transform the key_composite
 rounds = struct.unpack('<Q', header['transform_rounds'])[0]
 transformed_key = key_composite
 for _ in range(0, rounds):
-    transformed_key = context.cipher.encrypt(transformed_key)
+    transformed_key = cipher.encrypt(transformed_key)
 
 # combine the transformed key with the header master seed to find the master_key
 transformed_key = hashlib.sha256(transformed_key).digest()
 master_key = hashlib.sha256(bytes(header['master_seed']) + transformed_key).digest()
 
 # set up a context for AES128-CBC decryption to find the decrypted payload
-context = Context()
-cipher = Cipher(b'AES', u'CBC')
-context.cipher = cipher
-context.key = master_key
-context.iv = bytes(header['encryption_iv'])
-raw_payload_area = context.cipher.decrypt(bytes(encrypted_payload))
+cipher = AES.new(master_key, AES.MODE_CBC, bytes(header['encryption_iv']))
+raw_payload_area = cipher.decrypt(bytes(encrypted_payload))
 
 # verify decryption
 if header['stream_start_bytes'] != raw_payload_area[:len(header['stream_start_bytes'])]:
     raise IOError('Decryption failed')
 
 # remove stream start bytes
-offset = len(header['stream_start_bytes'])
+payload_offset = len(header['stream_start_bytes'])
 payload_data = b''
 
 # read payload block data, block by block
 while True:
     # read index of block (4 bytes)
-    block_index = struct.unpack('<I', raw_payload_area[offset:offset + 4])[0]
+    block_index = struct.unpack('<I', raw_payload_area[payload_offset:payload_offset + 4])[0]
     # read block_data sha256 hash (32 bytes)
-    block_hash = raw_payload_area[offset + 4:offset + 36]
+    block_hash = raw_payload_area[payload_offset + 4:payload_offset + 36]
     # read block_data length (4 bytes)
-    block_length = struct.unpack('<I', raw_payload_area[offset + 36:offset + 40])[0]
+    block_length = struct.unpack('<I', raw_payload_area[payload_offset + 36:payload_offset + 40])[0]
     # read block_data
-    block_data = raw_payload_area[offset + 40:offset + 40 + block_length]
+    block_data = raw_payload_area[payload_offset + 40:payload_offset + 40 + block_length]
 
+    print(block_hash)
     # check if last block
     if block_hash == b'\x00' * 32 and block_length == 0:
         break
@@ -164,7 +156,7 @@ while True:
 
     # append verified block_data and move to next block
     payload_data += block_data
-    offset += 40 + block_length
+    payload_offset += 40 + block_length
 
 # check if payload_data is compressed
 if struct.unpack('<I', header['compression_flags']):

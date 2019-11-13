@@ -6,7 +6,7 @@ def fibonacci(start=0):
     c = 0
     iteration = 0
 
-    while True:
+    while iteration <= 5:
         if iteration >= start:
             yield c
 
@@ -17,16 +17,16 @@ def fibonacci(start=0):
         iteration += 1
 
 # get the 20th fibonacci number
-print(fibonacci(20).next())
+# print(fibonacci(20).next())
 
-fib = fibonacci(10)
+# fib = fibonacci(10)
 
-# get the 10th fibonacci number
-print(fib.next())
+# # get the 10th fibonacci number
+# print(fib.next())
 
-# get the 11th fibonacci number
-print(fib.next())
+# # get the 11th fibonacci number
+# print(fib.next())
 
-# get the 12th - 15th number as list
-print([fib.next() for _ in range(4)])
+# # get the 12th - 15th number as list
+# print([fib.next() for _ in range(4)])
 

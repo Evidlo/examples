@@ -39,6 +39,7 @@ header_item_ids = {0: 'end',
                    11: 'kdf_parameters'
 }
 
+
 # read dynamic header
 
 # offset of first header byte
@@ -61,6 +62,7 @@ while True:
         # insert item into header dict
         header[item_id] = b[offset:offset + size]
         offset += size
+    # print(item_id, size, header[item_id])
 
 header_end = offset
 
@@ -71,7 +73,7 @@ offset += 32
 header_hmac_hash = b[offset:offset + 32]
 offset += 32
 
-# read kdf parameters
+# ---------- Parse KDF Parameters ----------
 # https://github.com/dlech/KeePass2.x/blob/VS2017/KeePassLib/Cryptography/KeyDerivation/Argon2Kdf.cs#L33-39
 # https://github.com/dlech/KeePass2.x/blob/VS2017/KeePassLib/Cryptography/KeyDerivation/AesKdf.cs#L45-L46
 
@@ -183,18 +185,26 @@ assert header_hmac_hash == hmac.new(hmac_key, b[:header_end], hashlib.sha256).di
 payload_data = b''
 
 # read payload block data, block by block
+i = 0
 while True:
     # read hmac hash of payload data block (32 bytes)
     block_hmac_hash = b[offset:offset + 32]
+    offset += 32
     # read block size (4 bytes)
-    block_size, = struct.unpack('<I', b[offset + 32:offset + 36])
+    block_size, = struct.unpack('<I', b[offset:offset + 4])
     if block_size == 0:
         break
+    offset += 4
     # read block data (`block_size` bytes)
-    block_data = b[offset + 36:offset + 36 + block_size]
-    payload_data += block_data
+    block_data = b[offset:offset + block_size]
+    # validate block data
+    computed_hmac_hash = hmac.new(hashlib.sha512(struct.pack('<Q', i) + hashlib.sha512(header['master_seed'] + transformed_key + b'\x01').digest()).digest(),
+                   struct.pack('<Q', i) + struct.pack('<I', block_size) + block_data, hashlib.sha256).digest()
+    assert block_hmac_hash == computed_hmac_hash, "Payload verification failed"
 
-    offset += 36 + block_size
+
+    payload_data += block_data
+    offset += block_size
 
 payload_ciphers = {
     'aes256': b'1\xc1\xf2\xe6\xbfqCP\xbeX\x05!j\xfcZ\xff',
@@ -257,4 +267,4 @@ while True:
 # xml_data immediately follows inner header
 xml_data = payload_data[inner_offset:]
 
-print(xml_data)
+# print(xml_data)

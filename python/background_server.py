@@ -10,7 +10,9 @@ import time
 import daemon
 import traceback
 
-socket_file = '/tmp/socket'
+class SlaveException(Exception):
+    def __init__(self, tb):
+        self.tb = tb
 
 # a Traceback object is returned if the server has an exception
 class Traceback:
@@ -19,12 +21,9 @@ class Traceback:
     def __repr__(self):
         return self.traceback
 
-def server():
+def server(socket_file, idle_timeout=5, active_timeout=1):
     """listen on socket and respond to messages from client"""
-    # automatically close server after N seconds
-    timeout = 5
     listener = Listener(socket_file)
-    listener._listener._socket.settimeout(timeout)
 
     try:
         # simulate a slow server startup
@@ -33,21 +32,28 @@ def server():
 
     except Exception as e:
         # wait up to 1s for client to connect to send back exception info
-        listener._listener._socket.settimeout(1)
+        listener._listener._socket.settimeout(active_timeout)
         conn = listener.accept()
         conn.send(Traceback(traceback.format_exc()))
         sys.exit()
 
     try:
         while True:
-            try:
-                conn = listener.accept()
+            # try:
+            # automatically close server after N seconds
+            listener._listener._socket.settimeout(idle_timeout)
+            conn = listener.accept()
             # timeout if no client connects
-            except TimeoutError:
-                sys.exit()
+            # except TimeoutError:
+            #     sys.exit()
+
+            # set active timeout
+            listener._listener._socket.settimeout(active_timeout)
+
+            command = conn.recv()
 
             # server response
-            conn.send([2.25, None, 'junk', float])
+            conn.send([2.25, command, 'junk', float])
             # raise Exception
 
             # tell client we are done sending
@@ -63,7 +69,7 @@ def server():
         sys.exit()
 
 
-def client():
+def client(socket_file):
     """connect to server over socket"""
     conn = Client(socket_file)
 
@@ -81,9 +87,7 @@ def client():
 
         # handle server exception
         if type(result) is Traceback:
-            print('error on server')
-            print(result)
-            sys.exit()
+            raise SlaveException(result.traceback)
 
         # server is done sending
         elif result == False:
@@ -100,8 +104,9 @@ def client():
 def main():
 
     # if server is running, connect to it
+    socket_file = '/tmp/socket'
     if os.path.exists(socket_file):
-        client()
+        client(socket_file)
 
     # otherwise, fork server, then connect to it
     else:
@@ -110,11 +115,11 @@ def main():
         # parent process, run server() as unix daemon
         if pid == 0:
             with daemon.DaemonContext():
-                server()
+                server(socket_file)
         # child process
         else:
             time.sleep(.1)
-            client()
+            client(socket_file)
 
 
 if __name__ == '__main__':
