@@ -12,15 +12,15 @@
 /page_width 11 def
 
 % width of all graphic lines on page
-/solid_width 1 def
-/dotted_width .5 def
-/box_width .5 def
+/solid_thickness 1 def
+/dotted_thickness .5 def
+/box_thickness .5 def
 
-/grid_spacing 1 8 div def
+/grid_spacing .25 def
 % dashed line style
-/dash_style {1 setlinecap dotted_width setlinewidth [0 inch grid_spacing inch] 0} def
+/dash_style {1 setlinecap dotted_thickness setlinewidth [0 inch grid_spacing 2 div inch] 0} def
 % dashed box style
-/box_style {1 setlinecap dotted_width setlinewidth [1 32 div inch 1 16 div inch] 0} def
+/box_style {1 setlinecap dotted_thickness setlinewidth [1 32 div inch 1 16 div inch] 0} def
 % dashed line grayscale
 /dash_gray .25 def
 
@@ -28,17 +28,17 @@
 /title_height .5 def
 0 title_height neg inch moveto
 page_width inch 0 rlineto
-solid_width setlinewidth
+solid_thickness setlinewidth
 stroke
 
 % vertical separator
 page_width 2 div inch 0 moveto
 0 page_height neg inch rlineto
-solid_width setlinewidth
+solid_thickness setlinewidth
 stroke
 
 % draw box
-/box {
+/draw_box {
     /delta_y exch def
     /delta_x exch def
     gsave
@@ -46,7 +46,7 @@ stroke
     0 delta_y rlineto
     delta_x neg 0 rlineto
     0 delta_y neg rlineto
-    box_width setlinewidth
+    box_thickness setlinewidth
     % box_style setdash
     stroke
     grestore
@@ -71,58 +71,53 @@ setfont
 /draw_header {
     (topic) vertical
     1 16 div inch 0 rmoveto
-    1 inch .25 inch box
+    1 inch .25 inch draw_box
     1 8 div inch 0 rmoveto
     (tags) vertical
     1 16 div inch 0 rmoveto
-    3 inch .25 inch box
+    3 inch .25 inch draw_box
     1 8 div inch 0 rmoveto
     (page) vertical
     1 16 div inch 0 rmoveto
-    .5 inch .25 inch box
+    .5 inch .25 inch draw_box
 } def
 1 4 div inch -12 .25 inch sub moveto
 draw_header
 page_width 2 div 1 4 div add inch -12 .25 inch sub moveto
 draw_header
 
-%------- vertical alignment lines -------
-% vertical line spacing
-/vertical_spacing .25 def
+%------- alignment lines -------
+% dotted vertical line
 /vdotted {
-    vertical_spacing inch 0 rmoveto
     gsave
     0 page_height neg inch rlineto
     dash_style setdash
     dash_gray setgray
     stroke
     grestore
-    vertical_spacing inch 0 rmoveto
-    0 page_height neg inch rlineto
-    dash_style setdash
-    dash_gray setgray
-    stroke
+} def
+
+% series of vertical lines
+/draw_grid {
+    grid_spacing inch 0 inch rmoveto
+    vdotted
+    grid_spacing inch 0 rmoveto
+    19 {
+        vdotted
+        grid_spacing 2 div inch 0 rmoveto
+    } repeat
+    grid_spacing 2 div inch 0 rmoveto
+    19 {
+        vdotted
+        grid_spacing 2 div inch 0 rmoveto
+    } repeat
+
+    page_width 2 div inch title_height neg inch moveto
 } def
 
 0 title_height neg inch moveto
-vdotted
+draw_grid
 page_width 2 div inch title_height neg inch moveto
-vdotted
+draw_grid
 
-%------- horizontal alignment lines -------
-% horizontal line spacing
-/hdotted {
-    page_height grid_spacing div cvi {
-        gsave
-        page_width 2 div vertical_spacing 2 mul sub inch 0 rlineto
-        dash_style setdash
-        dash_gray setgray
-        stroke
-        grestore
-        0 grid_spacing neg inch rmoveto
-    } repeat
-} def
-vertical_spacing 2 mul inch title_height neg inch moveto
-hdotted
-page_width 2 div vertical_spacing 2 mul add inch title_height neg inch moveto
-hdotted
+showpage

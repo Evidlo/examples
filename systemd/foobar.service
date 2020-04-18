@@ -3,6 +3,8 @@ Description=A service that does foo
 
 [Service]
 WorkingDirectory=/full/path/to/dir/
+# wait for network online (requires NetworkManager)
+ExecStartPre=/usr/bin/nm-online --timeout=30
 # program to execute
 ExecStart=/full/path/to/program
 # restart if program crashes
