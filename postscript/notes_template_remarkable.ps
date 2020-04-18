@@ -1,0 +1,123 @@
+%!
+% Evan Widloski - 2018-01-22
+% Class Notes Template
+
+% set landscape
+90 rotate
+
+/inch {72 mul} def
+
+% define page dimensions
+/page_height 6.18 def
+/page_width 8.24 def
+
+% width of all graphic lines on page
+/solid_thickness 1 def
+/dotted_thickness .5 def
+/box_thickness .5 def
+
+/grid_spacing .25 def
+% dashed line style
+/dash_style {1 setlinecap dotted_thickness setlinewidth [0 inch grid_spacing 2 div inch] 0} def
+% dashed box style
+/box_style {1 setlinecap dotted_thickness setlinewidth [1 32 div inch 1 16 div inch] 0} def
+% dashed line grayscale
+/dash_gray .25 def
+
+% horizontal title line
+/title_height .5 def
+0 title_height neg inch moveto
+page_width inch 0 rlineto
+solid_thickness setlinewidth
+stroke
+
+% vertical separator
+page_width 2 div inch 0 moveto
+0 page_height neg inch rlineto
+solid_thickness setlinewidth
+stroke
+
+% draw box
+/draw_box {
+    /delta_y exch def
+    /delta_x exch def
+    gsave
+    delta_x 0 rlineto
+    0 delta_y rlineto
+    delta_x neg 0 rlineto
+    0 delta_y neg rlineto
+    box_thickness setlinewidth
+    % box_style setdash
+    stroke
+    grestore
+    delta_x 0 rmoveto
+} def
+
+% vertical text
+/vertical{
+    gsave
+    90 rotate
+    dup stringwidth exch pop
+    0 exch neg rmoveto
+    show
+    grestore
+} def
+
+
+%-------- title bar --------
+/Helvetica findfont
+8 scalefont
+setfont
+/draw_header {
+    (topic) vertical
+    1 16 div inch 0 rmoveto
+    1 inch .25 inch draw_box
+    1 8 div inch 0 rmoveto
+    (tags) vertical
+    1 16 div inch 0 rmoveto
+    3 inch .25 inch draw_box
+    1 8 div inch 0 rmoveto
+    (page) vertical
+    1 16 div inch 0 rmoveto
+    .5 inch .25 inch draw_box
+} def
+1 4 div inch -12 .25 inch sub moveto
+draw_header
+page_width 2 div 1 4 div add inch -12 .25 inch sub moveto
+draw_header
+
+%------- alignment lines -------
+% dotted vertical line
+/vdotted {
+    gsave
+    0 page_height neg inch rlineto
+    dash_style setdash
+    dash_gray setgray
+    stroke
+    grestore
+} def
+
+% series of vertical lines
+/draw_grid {
+    grid_spacing inch 0 inch rmoveto
+    vdotted
+    grid_spacing inch 0 rmoveto
+    19 {
+        vdotted
+        grid_spacing 2 div inch 0 rmoveto
+    } repeat
+    grid_spacing 2 div inch 0 rmoveto
+    19 {
+        vdotted
+        grid_spacing 2 div inch 0 rmoveto
+    } repeat
+
+    page_width 2 div inch title_height neg inch moveto
+} def
+
+0 title_height neg inch moveto
+draw_grid
+page_width 2 div inch title_height neg inch moveto
+draw_grid
+
+showpage

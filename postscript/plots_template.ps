@@ -1,0 +1,73 @@
+%!
+% Evan Widloski - 2018-09-11
+% Class Notes Template
+
+/inch {72 mul} def
+
+% define page dimensions
+/page_width 8.5 def
+/page_height 11 def
+
+% width of all graphic lines on page
+/solid_thickness 1 def
+/dotted_thickness .5 def
+/box_thickness .5 def
+
+/grid_spacing .125 def
+% dashed line style
+/dash_style {1 setlinecap dotted_thickness setlinewidth [0 inch grid_spacing inch] 0} def
+% dashed box style
+/box_style {1 setlinecap dotted_thickness setlinewidth [1 32 div inch 1 16 div inch] 0} def
+% dashed line grayscale
+/dash_gray .25 def
+
+% draw grid with width/height
+/draw_grid {
+    /delta_y exch def
+    /delta_x exch def
+
+    gsave
+    delta_x grid_spacing div cvi {
+        gsave
+        0 delta_y inch rlineto
+        dash_style setdash
+        dash_gray setgray
+        stroke
+        grestore
+        grid_spacing inch 0 rmoveto
+    } repeat
+    grestore
+} def
+
+% draw box with width/height
+/draw_box {
+    /delta_y exch def
+    /delta_x exch def
+
+    delta_x inch 0 rlineto
+    0 delta_y inch rlineto
+    delta_x neg inch 0 rlineto
+    0 delta_y neg inch rlineto
+    delta_x delta_y draw_grid
+} def
+
+
+%------- alignment lines -------
+
+0 0 moveto
+
+/Helvetica findfont
+20 scalefont setfont
+
+newpath
+
+1 inch  2 inch moveto
+1.5 1.5 draw_box
+gsave
+stroke
+grestore
+(lkjlkj) show
+
+closepath
+
+showpage

@@ -1,0 +1,12 @@
+[Unit]
+Description=Mount remote fs with sshfs
+
+[Install]
+WantedBy=multi-user.target
+
+[Mount]
+What=username@host.example.com:/
+Where=/mnt/foobar
+Type=fuse.sshfs
+Options=allow_other,IdentityFile=/home/username/.ssh/id_rsa,reconnect,ServerAliveInterval=30,ServerAliveCountMax=5,x-systemd.automount,uid=1000,gid=1000
+TimeoutSec=60
