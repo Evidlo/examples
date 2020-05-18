@@ -1,0 +1,40 @@
+%!
+% Evan Widloski - 2020-05-18
+% Dots Template
+
+% set landscape
+90 rotate
+
+/inch {72 mul} def
+
+% define page dimensions
+/page_height 8.5 def
+/page_width 11 def
+
+% width of all graphic lines on page
+/dotted_thickness .5 def
+
+/grid_spacing .125 def
+% dashed line style
+/dash_style {1 setlinecap dotted_thickness setlinewidth [0 inch grid_spacing inch] 0} def
+% dashed line grayscale
+/dash_gray .25 def
+
+% dotted vertical line
+/vdotted {
+    gsave
+    0 page_height neg inch rlineto
+    dash_style setdash
+    dash_gray setgray
+    stroke
+    grestore
+} def
+
+% move to origin
+0 0 moveto
+page_width grid_spacing div cvi {
+    vdotted
+    grid_spacing inch 0 rmoveto
+} repeat
+
+showpage
