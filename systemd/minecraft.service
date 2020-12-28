@@ -1,0 +1,18 @@
+[Unit]
+description=minecraft service
+
+[Service]
+WorkingDirectory=/opt/minecraft
+User=minecraft
+
+ExecStart=/usr/bin/screen -DmS minecraft /usr/bin/java -Xmx4096M -Xms4096M -jar minecraft_server.jar nogui
+Restart=always
+
+ExecStop=/usr/bin/screen -p 0 -S minecraft -X eval 'stuff "say server shutting down"\\015'
+ExecStop=/usr/bin/screen -p 0 -S minecraft -X eval 'stuff "save-all"\\015'
+ExecStop=/usr/bin/screen -p 0 -S minecraft -X eval 'stuff "stop"\\015'
+ExecStop=/bin/sleep 2
+
+[Install]
+
+WantedBy=multi-user.target
