@@ -1,0 +1,10 @@
+[Unit]
+Description=synapse
+
+[Service]
+WorkingDirectory=/home/evan/resources/synapse
+ExecStart=/home/evan/resources/venv3/bin/synctl --no-daemonize start
+Restart=always
+
+[Install]
+WantedBy=multi-user.target

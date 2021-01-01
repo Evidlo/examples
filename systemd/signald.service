@@ -1,0 +1,9 @@
+[Unit]
+Description=signald
+
+[Service]
+ExecStart=/usr/bin/signald
+Restart=always
+
+[Install]
+WantedBy=multi-user.target

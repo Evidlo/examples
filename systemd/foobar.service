@@ -9,7 +9,7 @@ ExecStartPre=/usr/bin/nm-online --timeout=30
 ExecStart=/full/path/to/program
 # restart if program crashes
 Restart=always
-# user to run program as (uncomment this line for user units)
+# user to run program as (comment this line for user units)
 User=foo
 
 [Install]

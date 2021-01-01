@@ -1,0 +1,11 @@
+[Unit]
+Description=mautrix-signal
+
+[Service]
+WorkingDirectory=/home/evan/resources/synapse
+ExecStart=/home/evan/resources/venv3/bin/python -m mautrix_signal
+Restart=always
+
+[Install]
+WantedBy=multi-user.target
+Wants=signald.service
