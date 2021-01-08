@@ -1,4 +1,4 @@
-class MainA():
+class MainA(object):
     foobar = 'a'
 
     def show(self):
@@ -9,7 +9,7 @@ class MainB(MainA):
 
 class DerivedA(MainA):
     def show(self):
-        super().show()
+        super(DerivedA, self).show()
         print('the above line is ' + self.foobar)
 
 class DerivedB(MainB, DerivedA):
