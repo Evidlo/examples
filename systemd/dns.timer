@@ -1,0 +1,9 @@
+[Unit]
+Description=update DNS periodically
+
+[Timer]
+OnCalendar=*:00/30
+Persistent=true
+
+[Install]
+WantedBy=timers.target
