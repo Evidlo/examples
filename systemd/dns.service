@@ -3,19 +3,7 @@ Description=DNS updater for Namecheap
 
 [Service]
 Type=oneshot
-ExecStart=/bin/sh -c " \
-address=$(ip route|awk '/default/{print $7; exit}')
-subdomain=rm
-domain=example.com
-# get this from "Advanced DNS" page on Namecheap
-password=
-
-# only update on certain network
-if [[ $(iw dev wlan0 link) =~ Illinois ]]
-then
-    curl "https://dynamicdns.park-your-domain.com/update?host=${subdomain}&domain=${domain}&password=${password}&ip=${address}"
-fi
-"
+ExecStart=/etc/systemd/system/dns.sh
 
 [Install]
 WantedBy=suspend.target
