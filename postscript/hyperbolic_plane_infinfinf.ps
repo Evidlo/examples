@@ -1,0 +1,54 @@
+%!
+% https://en.wikipedia.org/wiki/Order-3_apeirogonal_tiling
+
+/inch {72 mul} def
+/page_width 8.5 inch def
+/page_height 11 inch def
+/center_x page_width 2 div def
+/center_y page_height 2 div def
+
+% /tan {dup sin exch cos div} def
+
+/radius page_width 1 inch sub 2 div def
+
+.001 inch setlinewidth
+
+% draw circular border
+center_x center_y radius 0 360 arc closepath stroke
+
+
+
+% direction(degrees) division(degrees) circ
+/circ {
+    /division exch def
+    /dir exch def
+    /theta 180 360 division div sub def
+    /start_ang dir 180 sub theta 2 div sub def
+    /end_ang dir 180 sub theta 2 div add def
+    /radius2 radius 180 division div sin theta 2 div sin div mul def
+
+    /distance radius theta 2 div sin div def
+    /new_x center_x dir cos distance mul add def
+    /new_y center_y dir sin distance mul add def
+    new_x new_y radius2 start_ang end_ang arc
+    stroke
+    % new_x new_y radius2 0 360 arc stroke
+} def
+
+
+% --------- recursive draw ----------
+/depth 10 def
+/division 3 def
+/direction 0 def
+depth {
+    /direction 180 division div def
+    /angle 360 division div def
+    division cvi {
+        direction division circ
+        /direction direction angle add def
+    } repeat
+    /division division 2 mul def
+} repeat
+
+
+showpage
