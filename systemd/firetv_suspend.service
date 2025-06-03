@@ -1,0 +1,11 @@
+[Unit]
+Description=Run foobar on sleep
+Before=sleep.target
+
+[Service]
+Type=oneshot
+User=evan
+ExecStart=/bin/sh -c "adb connect firetv:5555 | adb shell input keyevent 26"
+
+[Install]
+WantedBy=sleep.target
